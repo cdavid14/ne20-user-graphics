@@ -5,44 +5,8 @@
  */
 package ne20.user.monitor;
 
-import java.awt.Color;
-import java.awt.List;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.Cursor;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.LogarithmicAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
-import org.snmp4j.CommunityTarget;
-import org.snmp4j.PDU;
-import org.snmp4j.Snmp;
-import org.snmp4j.Target;
-import org.snmp4j.TransportMapping;
-import org.snmp4j.event.ResponseEvent;
-import org.snmp4j.mp.SnmpConstants;
-import org.snmp4j.smi.Address;
-import org.snmp4j.smi.GenericAddress;
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.OctetString;
-import org.snmp4j.smi.Variable;
-import org.snmp4j.smi.VariableBinding;
-import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.snmp4j.util.DefaultPDUFactory;
-import org.snmp4j.util.TreeEvent;
-import org.snmp4j.util.TreeUtils;
 
 /**
  *
@@ -50,6 +14,8 @@ import org.snmp4j.util.TreeUtils;
  */
 public class Monitor extends javax.swing.JFrame {
 
+    
+    
     /**
      * Creates new form Monitor
      */
@@ -84,10 +50,16 @@ public class Monitor extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         usuario = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        INICIAR = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        velocidade = new javax.swing.JLabel();
+        PARAR = new javax.swing.JButton();
+        loading = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("NE20 - VIVA");
+        setResizable(false);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
@@ -107,18 +79,18 @@ public class Monitor extends javax.swing.JFrame {
         jPanel1.add(usuario, gridBagConstraints);
         usuario.getAccessibleContext().setAccessibleName("");
 
-        jButton1.setText("INICIAR");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        INICIAR.setText("INICIAR");
+        INICIAR.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                INICIARActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.ipadx = 80;
-        jPanel1.add(jButton1, gridBagConstraints);
+        jPanel1.add(INICIAR, gridBagConstraints);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel5.setText("Analisador de tráfego dos clientes no NE20");
@@ -126,10 +98,51 @@ public class Monitor extends javax.swing.JFrame {
         jLabel5.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jPanel1.add(jLabel5, gridBagConstraints);
+
+        jLabel1.setText("Up/Down:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.ipady = 21;
+        jPanel1.add(jLabel1, gridBagConstraints);
+
+        velocidade.setText("Sem informação");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        jPanel1.add(velocidade, gridBagConstraints);
+
+        PARAR.setText("PARAR");
+        PARAR.setEnabled(false);
+        PARAR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PARARActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.ipadx = 80;
+        jPanel1.add(PARAR, gridBagConstraints);
+
+        loading.setBorderPainted(false);
+        loading.setEnabled(false);
+        loading.setFocusable(false);
+        loading.setIndeterminate(true);
+        loading.setPreferredSize(new java.awt.Dimension(10, 25));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 4.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 33, 0);
+        jPanel1.add(loading, gridBagConstraints);
+        loading.setVisible(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -137,83 +150,35 @@ public class Monitor extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void INICIARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_INICIARActionPerformed
         // TODO add your handling code here:
+        INICIAR.setEnabled(false);
+        PARAR.setEnabled(false);
+        usuario.setEditable(false);
+        loading.setVisible(true);
+        ExibirVelocidade query = new ExibirVelocidade(INICIAR,PARAR,velocidade,usuario,jPanel1,loading,"172.16.254.65","Viva100%");
+        query.start();
+        jPanel1.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    }//GEN-LAST:event_INICIARActionPerformed
 
-        try {
-
-            final gerarGrafico demo = new gerarGrafico(usuario.getText(), usuario.getText());
-            demo.pack();
-            RefineryUtilities.centerFrameOnScreen(demo);
-            demo.setVisible(true);
-            try {
-                double tempUpV4 = Double.parseDouble(demo.doGet(".1.3.6.1.4.1.2011.5.2.1.15.1.36." + demo.clientOID, demo.target));
-                double tempUpV6 = Double.parseDouble(demo.doGet(".1.3.6.1.4.1.2011.5.2.1.15.1.70." + demo.clientOID, demo.target));
-                double tempDownV4 = Double.parseDouble(demo.doGet(".1.3.6.1.4.1.2011.5.2.1.15.1.37." + demo.clientOID, demo.target));
-                double tempDownV6 = Double.parseDouble(demo.doGet(".1.3.6.1.4.1.2011.5.2.1.15.1.71." + demo.clientOID, demo.target));
-
-                if (demo.lastUP != 0.0) {
-                    double up = (tempUpV4 + tempUpV6) - demo.lastUP;
-                    demo.s1.add(up, System.currentTimeMillis() / 10000);
-                } else {
-                    demo.lastUP = tempUpV4 + tempUpV6;
-                }
-
-                if (demo.lastDOWN != 0.0) {
-                    double down = (tempDownV4 + tempDownV6) - demo.lastDOWN;
-                    demo.s2.add(down, System.currentTimeMillis() / 10000);
-                } else {
-                    demo.lastDOWN = tempDownV4 + tempDownV6;
-                }
-
-                //demo.s1.add(, System.currentTimeMillis() / 1000 /1000);
-            } catch (IOException ex) {
-                System.out.println("MERDA");
-                Logger.getLogger(gerarGrafico.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        /*
-        try {
-            System.out.println("udp:" + usuario.getText() + "/161");
-            SNMPManager client = new SNMPManager("udp:172.16.254.65/161","Viva100%");
-            client.start();
-            
-            System.out.println("sys =" + client.getAsString(new OID(".1.3.6.1.2.1.1.1.0")) );
-            
-            
-            OID[] arr_o = new OID[1];
-            arr_o[0] = new OID(".1.3.6.1.4.1.2011.5.2.1.15.1.36.3343") ;
-            ResponseEvent e = client.get(arr_o);
-            
-            System.out.println("response is: " + e.getResponse().get(0).getVariable().toLong());
-            
-            
-            System.out.println();
-        }catch(Exception e){
-            System.out.println("MERDA");
-            e.printStackTrace();
-        }
+    private void PARARActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PARARActionPerformed
+        // TODO add your handling code here:
         
-         */
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_PARARActionPerformed
 
     /**
      * @param args the command line arguments
@@ -250,12 +215,18 @@ public class Monitor extends javax.swing.JFrame {
         });
     }
 
+    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton INICIAR;
+    private javax.swing.JButton PARAR;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JProgressBar loading;
     private javax.swing.ButtonGroup snmp_versao;
     private javax.swing.JTextField usuario;
+    private javax.swing.JLabel velocidade;
     // End of variables declaration//GEN-END:variables
 }
