@@ -12,7 +12,10 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +27,9 @@ import javax.swing.tree.DefaultTreeCellEditor;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialCap;
 import org.jfree.chart.plot.dial.DialPlot;
@@ -35,7 +41,9 @@ import org.jfree.chart.plot.dial.StandardDialScale;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.GradientPaintTransformType;
 import org.jfree.ui.StandardGradientPaintTransformer;
 
@@ -55,6 +63,9 @@ public class ExtJPanel extends JPanel {
     private ArrayList<NE20UserTraff> traff = new ArrayList<>();
     
     private JTextField jtub,jtdb,jtiur,jtidr;
+    
+    private Histogram jph;
+    
     public ExtJPanel(String ip, String login){
         this.ip = ip; 
         this.login = login;
@@ -121,11 +132,7 @@ public class ExtJPanel extends JPanel {
         
         
         //
-        TitledBorder th = new TitledBorder("Histograma");
-        th.setTitleJustification(TitledBorder.CENTER);
-        th.setTitlePosition(TitledBorder.TOP);
-        JPanel jph = new JPanel();
-        jph.setBorder(th);
+        jph = new Histogram();
         
         //
         TitledBorder tsu = new TitledBorder("Upload");
@@ -201,6 +208,7 @@ public class ExtJPanel extends JPanel {
 
                                     oMeterUpload.update(uprate);
                                     oMeterDownload.update(downrate);
+                                    jph.update(uprate, downrate);
 
                                     jtiur.setText(""+uprate);
                                     jtidr.setText(""+downrate);
@@ -232,22 +240,49 @@ public class ExtJPanel extends JPanel {
     }
 }
 class Histogram extends JPanel{
-    HistogramDataset dataset = new HistogramDataset();
+    private TimeSeries seriesUpload,seriesDownload;
+    private TimeSeriesCollection dataset;
+    
+    public void update(double upload,double download){
+        //GregorianCalendar calendar = new GregorianCalendar();
+        //calendar.setTimeInMillis(millis);
+        seriesDownload.add(new Millisecond(  ), download);
+        seriesUpload.add(new Millisecond(  ), upload);
+    }
     public Histogram(){
-        dataset.setType(HistogramType.FREQUENCY);
+        seriesUpload = new TimeSeries("Upload");
+        seriesDownload = new TimeSeries("Download");
         
-        dataset.addSeries("Download",new double[]{},0);
-        dataset.addSeries("Upload",new double[]{},1);
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(seriesUpload);
+        dataset.addSeries(seriesDownload);
         
-         JFreeChart chart = ChartFactory.createTimeSeriesChart(
-            "Legal & General Unit Trust Prices",  // title
-            "Date",             // x-axis label
-            "Price Per Unit",   // y-axis label
-            dataset,            // data
-            true,               // create legend?
-            true,               // generate tooltips?
-            false               // generate URLs?
-        );
+        JFreeChart chart = ChartFactory.createTimeSeriesChart("Histograma","", "Rate(mbps)", 
+                dataset);
+        
+        final XYPlot plot = chart.getXYPlot();
+        ValueAxis axis = plot.getDomainAxis();
+        axis.setAutoRange(true);
+        axis.setFixedAutoRange(180000.0); 
+        
+        axis = plot.getRangeAxis();
+        axis.setFixedAutoRange(10);
+        axis.setAutoRange(true);
+        
+        ChartPanel chartpanel = new ChartPanel(chart);
+        chartpanel.setPreferredSize(new Dimension(400, 200));
+        
+        add(chartpanel);
+        
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                //System.out.println("x="+e.getComponent().getSize().width+" y="+e.getComponent().getSize().height);
+                chartpanel.setSize(e.getComponent().getSize());
+                chartpanel.setPreferredSize(e.getComponent().getSize());
+                chartpanel.validate();
+            }
+        });
     }
 }
 
