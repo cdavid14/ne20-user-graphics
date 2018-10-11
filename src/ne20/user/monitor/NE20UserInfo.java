@@ -17,4 +17,5 @@ public class NE20UserInfo {
     public NE20UserInfo(){ }
     public String login = "";
     public int ne20id = -1;
+    
 }

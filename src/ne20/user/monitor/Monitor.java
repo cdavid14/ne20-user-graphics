@@ -6,9 +6,6 @@
 package ne20.user.monitor;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,33 +15,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.MaskFormatter;
 import net.sourceforge.yamlbeans.YamlException;
 import net.sourceforge.yamlbeans.YamlReader;
 import net.sourceforge.yamlbeans.YamlWriter;
-import org.snmp4j.smi.IpAddress;
 
 /**
  *
@@ -55,10 +47,9 @@ public class Monitor extends javax.swing.JFrame {
     private JPanel jpmestre, jpleste, jpcentro, jpoeste, jpsul;
     private ArrayList<NE20Info> nes;
     private ArrayList<NE20Server> servers;
-    JTabbedPane tabbedPane = new JTabbedPane();
+    static JTabbedPane tabbedPane = new JTabbedPane();
     JTextField txlo;
     JComboBox jcne20;
-    private static SplashScreen loading;
 
     /**
      * Creates new form Monitor
@@ -91,7 +82,29 @@ public class Monitor extends javax.swing.JFrame {
 
         readNE20();
 
-        loading.stop();
+        ////////////////////////////////////////////////////////////////////////
+        //MENU
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+        
+        JMenu editarMenu = new JMenu("Configurações");
+        menuBar.add(editarMenu);
+
+        JMenuItem editSrvMenu = new JMenuItem("Editar Servidores");
+        editarMenu.add(editSrvMenu);
+
+        JMenuItem aboutMenu = new JMenuItem("Sobre o sistema");
+        menuBar.add(aboutMenu);
+
+        aboutMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JDialog f;
+                f = new SobreNos(new JFrame());
+                f.setVisible(true);
+            }
+        });
+
         ////////////////////////////////////////////////////////////////////////
         //CENTRO
         jpcentro = new JPanel(new GridLayout(1, 1));
@@ -154,15 +167,6 @@ public class Monitor extends javax.swing.JFrame {
                 btnClose.setFocusPainted(false);
                 btnClose.setContentAreaFilled(false);
                 btnClose.setMargin(new Insets(0, 0, 0, 0));
-                btnClose.addMouseListener(new java.awt.event.MouseAdapter() {
-                    public void mouseEntered(java.awt.event.MouseEvent evt) {
-                        btnClose.setBackground(Color.RED);
-                    }
-
-                    public void mouseExited(java.awt.event.MouseEvent evt) {
-                        btnClose.setBackground(null);
-                    }
-                });
 
                 //Propriedades do texto
                 GridBagConstraints gbc = new GridBagConstraints();
@@ -183,11 +187,8 @@ public class Monitor extends javax.swing.JFrame {
                 //Evento do botão de fechar
                 btnClose.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        Component selected = tabbedPane.getSelectedComponent();
-                        if (selected != null) {
-                            novo.stop();
-                            tabbedPane.remove(selected);
-                        }
+                        JLabel selected = (JLabel) btnClose.getParent().getComponent(0);
+                        tabbedPane.remove(tabbedPane.indexOfTab(selected.getText()));
                     }
                 });
                 new Thread(new Runnable() {
@@ -209,8 +210,6 @@ public class Monitor extends javax.swing.JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         add(jpmestre);
-
-        loading.stop();
     }
 
     private void readNE20() {
@@ -225,7 +224,6 @@ public class Monitor extends javax.swing.JFrame {
                 nes.add(ne);
                 NE20Server server = new NE20Server(ne);
                 servers.add(server);
-                server.readServer();
                 server.start();
             }
         } catch (FileNotFoundException ex) {
@@ -238,7 +236,7 @@ public class Monitor extends javax.swing.JFrame {
     private void startProperties() {
 
         try {
-            NE20Info info = new NE20Info("172.16.254.65", "Viva100%");
+            NE20Info info = new NE20Info("localhost", "public");//IP e Community
             YamlWriter writer = new YamlWriter(new FileWriter(".config.yml"));
             writer.write(info);
             writer.close();
@@ -310,8 +308,6 @@ public class Monitor extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        loading = new SplashScreen();
-        loading.start();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
