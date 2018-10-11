@@ -86,6 +86,7 @@ public class NE20Server extends Thread{
     }
     public void readServer(){
         try {
+            sync = true;
             ArrayList<NE20UserInfo> temp = new ArrayList<>();
             
             Map<String, String> result = this.doWalk(".1.3.6.1.4.1.2011.5.2.1.15.1.3", target); // ifTable, mib-2 interfaces
@@ -104,11 +105,13 @@ public class NE20Server extends Thread{
                     writer.write(users.get(i));
                 }
                 writer.close();
+                last_server_read = java.lang.System.currentTimeMillis() / 1000;
             } catch (YamlException ex) {
                 Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
             }
+            sync = false;
         } catch (IOException ex) {
             Logger.getLogger(NE20Server.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -118,9 +121,27 @@ public class NE20Server extends Thread{
     public boolean hasData(String login){
         for(int i=0;i< users.size();i++){
             if(users.get(i).login.equals(login) && users.get(i).ne20id>0)
-                return true;
+                if(compareOIDLogin(users.get(i)))
+                    return true;
         }
         
+        return false;
+    }
+    
+    public boolean isSync(){
+        return this.sync;
+    }
+    
+    public boolean compareOIDLogin(NE20UserInfo user){
+        try {
+            String loginNE20 = this.doGet(".1.3.6.1.4.1.2011.5.2.1.15.1.3." + user.ne20id, target);
+            if(loginNE20.startsWith(user.login+"@"))
+                return true;
+            else
+                return false;
+        } catch (IOException ex) {
+            Logger.getLogger(NE20Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return false;
     }
     
@@ -140,10 +161,9 @@ public class NE20Server extends Thread{
             long now = java.lang.System.currentTimeMillis() / 1000;
             if(now - last_server_read > 300){
                 readServer();
-                last_server_read = java.lang.System.currentTimeMillis() / 1000;
             }
 
-            sleep(1000);
+            sleep(5000);
             
         }
         } catch (InterruptedException ex) {

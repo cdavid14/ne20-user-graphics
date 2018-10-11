@@ -173,13 +173,16 @@ public class ExtJPanel extends JPanel {
         this.server = server;
     }
     
+    public boolean isServerSync(){
+        return server.isSync();
+    }
+    
     public void doYourThings(){
         status.setText("Perguntando ao servidor...");
         
         while(running){
             try {
                 if(server.hasData(login)){
-                    
                     NE20UserInfo info = server.NE20UserInfo(login);
                     //obter valores
                     NE20UserTraff usertraff = server.getUserTraff(info);
@@ -238,6 +241,14 @@ public class ExtJPanel extends JPanel {
         }
         
     }
+    
+    public void start(){
+        this.running = true;
+    }
+    
+    public void stop(){
+        this.running = false;
+    }
 }
 class Histogram extends JPanel{
     private TimeSeries seriesUpload,seriesDownload;
@@ -280,6 +291,8 @@ class Histogram extends JPanel{
                 //System.out.println("x="+e.getComponent().getSize().width+" y="+e.getComponent().getSize().height);
                 chartpanel.setSize(e.getComponent().getSize());
                 chartpanel.setPreferredSize(e.getComponent().getSize());
+                chartpanel.setDomainZoomable(false);
+                chartpanel.setRangeZoomable(false);
                 chartpanel.validate();
             }
         });
