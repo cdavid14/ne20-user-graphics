@@ -224,7 +224,7 @@ public class Monitor extends javax.swing.JFrame {
         setTitle("NE20 Monitor");
     }
 
-    private void readNE20() {
+    public void readNE20() {
         try {
             YamlReader reader = new YamlReader(new FileReader(".config.yml"));
             servers.clear();

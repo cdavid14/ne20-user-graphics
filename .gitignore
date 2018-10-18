@@ -1,1 +1,4 @@
 /dist/
+.user*.yaml
+.config.yaml
+/build/

@@ -6,7 +6,6 @@
 package ne20.user.monitor;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -46,7 +45,8 @@ public class EditarServidores extends JFrame {
         jbadicionar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                
+                AdicionarServidor a = new AdicionarServidor(m,model);
+                a.setVisible(true);
             }
         });
         
@@ -62,8 +62,8 @@ public class EditarServidores extends JFrame {
                         temp.remove(selectID);
                         m.saveProperties(temp);
                         System.out.println("REMOVE: "+selectID);
-                        lista.remove(selectID);
-                        m.jcne20.remove(selectID);
+                        model.remove(selectID);
+                        m.jcne20.removeItemAt(selectID);
                     }
                 }
             }
@@ -81,7 +81,7 @@ public class EditarServidores extends JFrame {
         
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.ipady = 120;
+        gbc.ipady = 300;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         jpmestre.add(jsplista,gbc);
         
