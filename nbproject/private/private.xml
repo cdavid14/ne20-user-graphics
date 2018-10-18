@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Christian/Documents/ne20-user-graphics/src/ne20/user/monitor/Monitor.java</file>
-            <file>file:/C:/Users/Christian/Documents/ne20-user-graphics/src/ne20/user/monitor/ExtJPanel.java</file>
-            <file>file:/C:/Users/Christian/Documents/ne20-user-graphics/src/ne20/user/monitor/SplashScreen.java</file>
-            <file>file:/C:/Users/Christian/Documents/ne20-user-graphics/src/ne20/user/monitor/NE20UserInfo.java</file>
-            <file>file:/C:/Users/Christian/Documents/ne20-user-graphics/src/ne20/user/monitor/NE20Server.java</file>
+            <file>file:/home/christian/dev/ne20-user-graphics/src/ne20/user/monitor/Monitor.java</file>
+            <file>file:/home/christian/dev/ne20-user-graphics/src/ne20/user/monitor/EditarServidores.java</file>
+            <file>file:/home/christian/dev/ne20-user-graphics/src/ne20/user/monitor/NE20Info.java</file>
+            <file>file:/home/christian/dev/ne20-user-graphics/src/ne20/user/monitor/AdicionarServidor.java</file>
+            <file>file:/home/christian/dev/ne20-user-graphics/src/ne20/user/monitor/ExtJPanel.java</file>
         </group>
     </open-files>
 </project-private>

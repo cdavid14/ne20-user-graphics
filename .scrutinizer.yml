@@ -1,0 +1,15 @@
+checks:
+    java: true
+filter:
+    excluded_paths: [build/*,lib/*,nbproject/*,tests/*]
+build:
+    environment:
+        java: 'java-8-oracle'
+    nodes:
+        analysis:
+            tests:
+                override:
+                    - java-scrutinizer-run
+                    -
+                        command: java-sonar-run
+                        use_website_config: true
