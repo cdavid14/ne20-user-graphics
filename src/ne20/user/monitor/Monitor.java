@@ -50,11 +50,13 @@ public class Monitor extends javax.swing.JFrame {
     static JTabbedPane tabbedPane = new JTabbedPane();
     JTextField txlo;
     JComboBox jcne20;
+    private Monitor me;
 
     /**
      * Creates new form Monitor
      */
     public Monitor() {
+        this.me = this;
         try {
             // Set cross-platform Java L&F (also called "Metal")
             javax.swing.UIManager.setLookAndFeel(
@@ -102,6 +104,15 @@ public class Monitor extends javax.swing.JFrame {
                 JDialog f;
                 f = new SobreNos(new JFrame());
                 f.setVisible(true);
+            }
+        });
+        
+        editSrvMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae){
+                //System.out.println("teste:"+ me);
+                EditarServidores edit = new EditarServidores(me);
+                edit.setVisible(true);
             }
         });
 
@@ -210,18 +221,23 @@ public class Monitor extends javax.swing.JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         add(jpmestre);
+        setTitle("NE20 Monitor");
     }
 
     private void readNE20() {
         try {
             YamlReader reader = new YamlReader(new FileReader(".config.yml"));
+            servers.clear();
+            nes.clear();
             while (true) {
-                NE20Info ne = reader.read(NE20Info.class);
+                
+                NE20Info ne = (NE20Info)reader.read();
                 if (ne == null) {
                     break;
                 }
-
+                
                 nes.add(ne);
+                
                 NE20Server server = new NE20Server(ne);
                 servers.add(server);
                 server.start();
@@ -232,11 +248,28 @@ public class Monitor extends javax.swing.JFrame {
             Logger.getLogger(Monitor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public ArrayList<NE20Info> getNES(){
+        return this.nes;
+    }
+    
+    public void saveProperties(ArrayList<NE20Info> temp){
+        try {
+            YamlWriter writer = new YamlWriter(new FileWriter(".config.yml"));
+            for(NE20Info t : temp){
+                writer.write(t);
+            }
+            writer.close();
+            nes = temp;
+        } catch (IOException ex) {
+        } catch (YamlException ex) {
+        }
+    }
 
     private void startProperties() {
 
         try {
-            NE20Info info = new NE20Info("localhost", "public");//IP e Community
+            NE20Info info = new NE20Info("10.10.10.10","adsl");
             YamlWriter writer = new YamlWriter(new FileWriter(".config.yml"));
             writer.write(info);
             writer.close();
